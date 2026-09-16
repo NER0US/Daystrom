@@ -35,6 +35,7 @@ body {
   color: var(--cth-lcars-ink);
 }
 .daystrom-shell .cth-titlebar-drag {
+  position: relative;
   background: var(--cth-lcars-space) !important;
   border-bottom: 3px solid var(--cth-lcars-orange) !important;
 }
@@ -64,6 +65,21 @@ body {
   border-radius: 28px 8px 8px 28px;
   overflow: hidden;
   background: radial-gradient(circle at 50% 40%, #27334c 0%, var(--cth-lcars-space) 75%);
+}
+.daystrom-shell > div:nth-of-type(2) > div:first-child::before {
+  content: '';
+  position: absolute;
+  inset: 14px;
+  border: 1px solid rgba(204, 153, 255, .45);
+  border-radius: 48% 48% 12px 12px;
+  pointer-events: none;
+  z-index: 2;
+}
+.daystrom-shell > div:nth-of-type(2) > div:nth-child(3) {
+  border: 3px solid var(--cth-lcars-lavender);
+  border-radius: 8px 28px 28px 8px;
+  overflow: hidden;
+  background: var(--cth-lcars-panel);
 }
 .daystrom-shell .cth-tabbar button,
 .daystrom-shell [role='tab'] {
