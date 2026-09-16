@@ -2,6 +2,15 @@
 // Any change here must also update tokens.css.
 
 export const colors = {
+  lcars: {
+    space: 0x090d18,
+    panel: 0x11182a,
+    orange: 0xff9966,
+    peach: 0xffcc99,
+    lavender: 0xcc99ff,
+    blue: 0x99ccff,
+    ink: 0xf2eee8,
+  },
   cream: {
     50: 0xfffdf5,
     100: 0xfff8e7,

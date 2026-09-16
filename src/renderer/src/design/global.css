@@ -29,6 +29,53 @@ body {
     );
 }
 
+/* Daystrom bridge chrome: LCARS-inspired framing around the live controls. */
+.daystrom-shell {
+  background: var(--cth-lcars-space);
+  color: var(--cth-lcars-ink);
+}
+.daystrom-shell .cth-titlebar-drag {
+  background: var(--cth-lcars-space) !important;
+  border-bottom: 3px solid var(--cth-lcars-orange) !important;
+}
+.daystrom-shell .cth-titlebar-drag::before {
+  content: 'DAYSTROM // COMMAND BRIDGE';
+  position: absolute;
+  left: 8px;
+  top: 10px;
+  color: var(--cth-lcars-peach);
+  font: 8px/12px var(--cth-font-display);
+  letter-spacing: 1px;
+}
+.daystrom-shell .cth-titlebar-drag img { display: none !important; }
+.daystrom-shell .cth-titlebar-drag button {
+  background: var(--cth-lcars-panel) !important;
+  color: var(--cth-lcars-peach) !important;
+  box-shadow: inset 0 0 0 1px var(--cth-lcars-lavender) !important;
+  border-radius: 10px !important;
+}
+.daystrom-shell .cth-titlebar-drag button:hover {
+  background: var(--cth-lcars-orange) !important;
+  color: var(--cth-lcars-space) !important;
+}
+.daystrom-shell > div:nth-of-type(2) { padding: 10px !important; gap: 10px !important; }
+.daystrom-shell > div:nth-of-type(2) > div:first-child {
+  border: 3px solid var(--cth-lcars-orange);
+  border-radius: 28px 8px 8px 28px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 40%, #27334c 0%, var(--cth-lcars-space) 75%);
+}
+.daystrom-shell .cth-tabbar button,
+.daystrom-shell [role='tab'] {
+  border-radius: 12px 3px 12px 3px !important;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+.daystrom-shell > div:last-of-type {
+  border-top: 3px solid var(--cth-lcars-lavender);
+  background: var(--cth-lcars-space);
+}
+
 button, input, textarea, select {
   font-family: inherit;
   font-size: inherit;

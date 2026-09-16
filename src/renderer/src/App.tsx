@@ -110,7 +110,7 @@ export function App() {
       useStore.getState().setHasGroqKey(!!c.groqApiKey);
       // Mirror the active office theme so OfficeFloor renders it (gated on the
       // tvShowOffices flag; off = always the office). Settings keeps this synced.
-      useStore.getState().setOfficeTheme(c.tvShowOffices ? (c.officeTheme ?? 'office') : 'office');
+      useStore.getState().setOfficeTheme(c.tvShowOffices ? (c.officeTheme ?? 'daystrom') : 'daystrom');
       // Mirror the triggers so Settings → Connections and the Command Center's
       // Triggers tab read one list, not two copies that drift — whichever surface
       // saves calls these same setters and the other repaints. No extra IPC: main
@@ -269,7 +269,7 @@ export function App() {
   }
 
   return (
-    <div style={{
+    <div className="daystrom-shell" style={{
       display: 'flex', flexDirection: 'column',
       width: '100vw', height: '100vh',
       overflow: 'hidden'
@@ -297,7 +297,7 @@ export function App() {
       >
         <img
           src={brandLogo}
-          alt="Munder Difflin"
+          alt="Daystrom"
           style={{ height: 20, width: 'auto', display: 'block' }}
         />
         {/* v0.3.7: the version is no longer inert text — it doubles as the

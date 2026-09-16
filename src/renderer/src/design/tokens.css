@@ -1,5 +1,12 @@
 /* Design tokens — mirrors tokens.ts. Update both together. */
 :root {
+  --cth-lcars-space: #090D18;
+  --cth-lcars-panel: #11182A;
+  --cth-lcars-orange: #FF9966;
+  --cth-lcars-peach: #FFCC99;
+  --cth-lcars-lavender: #CC99FF;
+  --cth-lcars-blue: #99CCFF;
+  --cth-lcars-ink: #F2EEE8;
   /* Base */
   --cth-cream-50:  #FFFDF5;
   --cth-cream-100: #FFF8E7;

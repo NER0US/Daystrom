@@ -33,6 +33,7 @@ import brooklyn99MapRaw from '@/assets/maps/brooklyn99.tmj?raw';
  *  (friends, brooklyn99, siliconvalley, got, hogwarts) land in later phases. */
 export type ThemeId =
   | 'office'
+  | 'daystrom'
   | 'friends'
   | 'brooklyn99'
   | 'siliconvalley'
@@ -285,10 +286,23 @@ export const BROOKLYN99_THEME: ThemeConfig = {
   cast: OFFICE_THEME.cast,
 };
 
+/** Daystrom keeps the proven office map and interaction anchors while changing
+ * the scene palette.  The Pixi bridge dressing is layered by OfficeFloor, so
+ * pathfinding, desk claims, and live message effects remain unchanged. */
+export const DAYSTROM_THEME: ThemeConfig = {
+  ...OFFICE_THEME,
+  id: 'daystrom',
+  palette: {
+    background: 0x090d18,
+    noteColors: { todo: 0xff9966, doing: 0xffcc99, blocked: 0xff6688, done: 0x99ccff },
+  },
+};
+
 /** All registered themes. Phase 0 ships only the office; show themes register
  *  here as their content lands (Phase 2). */
 export const THEMES: Partial<Record<ThemeId, ThemeConfig>> = {
   office: OFFICE_THEME,
+  daystrom: DAYSTROM_THEME,
   brooklyn99: BROOKLYN99_THEME,
 };
 
