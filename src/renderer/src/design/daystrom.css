@@ -1,0 +1,97 @@
+/*
+ * Daystrom Command skin foundation.
+ *
+ * Keep these overrides scoped to data-cth-skin="daystrom" so upstream office
+ * styling remains available as a fallback. The first pass intentionally maps
+ * existing semantic tokens instead of rewriting components.
+ */
+
+:root[data-cth-skin='daystrom'] {
+  /* Daystrom structural palette */
+  --daystrom-space: #0B0A0D;
+  --daystrom-console: #17151C;
+  --daystrom-bridge-sand: #C9B99A;
+  --daystrom-hull-stone: #928B83;
+  --daystrom-console-cream: #E8DDC8;
+
+  /* Daystrom interface accents */
+  --daystrom-command-coral: #D96B5F;
+  --daystrom-operations-amber: #E5A64A;
+  --daystrom-systems-gold: #D6C06F;
+  --daystrom-science-lavender: #9C8BC4;
+  --daystrom-comms-rose: #C77B9B;
+  --daystrom-medical-blue: #6E9EAE;
+  --daystrom-ready-green: #79A77A;
+  --daystrom-interlock-red: #B54E52;
+
+  /* Re-map the existing semantic accent language. */
+  --cth-coral: var(--daystrom-command-coral);
+  --cth-mint: var(--daystrom-ready-green);
+  --cth-sky: var(--daystrom-medical-blue);
+  --cth-lemon: var(--daystrom-operations-amber);
+  --cth-lilac: var(--daystrom-science-lavender);
+  --cth-peach: var(--daystrom-comms-rose);
+
+  --cth-status-idle: var(--daystrom-hull-stone);
+  --cth-status-thinking: var(--daystrom-science-lavender);
+  --cth-status-working: var(--daystrom-operations-amber);
+  --cth-status-waiting: var(--daystrom-comms-rose);
+  --cth-status-blocked: var(--daystrom-interlock-red);
+  --cth-status-success: var(--daystrom-ready-green);
+  --cth-status-compacting: var(--daystrom-science-lavender);
+  --cth-status-looping: var(--daystrom-command-coral);
+  --cth-status-typing: var(--daystrom-systems-gold);
+}
+
+/*
+ * Dark is the first fully-supported Daystrom presentation. It uses warm bridge
+ * neutrals around dark data surfaces, matching the visual contract while
+ * preserving the upstream token API.
+ */
+:root[data-cth-skin='daystrom'][data-cth-theme='dark'] {
+  --cth-cream-50: #0F0E12;
+  --cth-cream-100: #17151C;
+  --cth-cream-200: #242128;
+  --cth-cream-300: #343039;
+  --cth-paper-100: #131217;
+  --cth-paper-200: #1D1A21;
+
+  --cth-ink-900: #E8DDC8;
+  --cth-ink-700: #C9B99A;
+  --cth-ink-500: #AAA29A;
+  --cth-ink-300: #77717E;
+  --cth-ink-100: #3D3942;
+
+  --cth-coral-light: #3D2324;
+  --cth-mint-light: #223326;
+  --cth-sky-light: #213139;
+  --cth-lemon-light: #3B3020;
+  --cth-lilac-light: #302941;
+  --cth-peach-light: #3A2931;
+
+  --cth-panel-border: inset 0 0 0 1px #77717E;
+  --cth-panel-border-inset: inset 0 0 0 1px #3D3942;
+  --cth-panel-border-terminal: inset 0 0 0 1px #77717E;
+  --cth-panel-border-dialog: inset 0 0 0 1px #AAA29A;
+  --cth-shadow-hard: 4px 4px 0 rgba(0, 0, 0, 0.5);
+}
+
+/*
+ * The light variant is intentionally conservative for now. It gives us a
+ * valid fallback while keeping the existing theme switch operational until a
+ * dedicated bright-bridge treatment is designed.
+ */
+:root[data-cth-skin='daystrom'][data-cth-theme='light'] {
+  --cth-cream-50: #EEE6D8;
+  --cth-cream-100: #E8DDC8;
+  --cth-cream-200: #D9CBB5;
+  --cth-cream-300: #C9B99A;
+  --cth-paper-100: #F5EFE5;
+  --cth-paper-200: #DDD2C0;
+
+  --cth-ink-900: #17151C;
+  --cth-ink-700: #332F38;
+  --cth-ink-500: #5E5864;
+  --cth-ink-300: #827B84;
+  --cth-ink-100: #B9AEA3;
+}
