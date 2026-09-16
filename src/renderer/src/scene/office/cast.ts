@@ -1,4 +1,4 @@
-// The Office cast — roster metadata + sprite frames.
+// Daystrom bridge cast — stable legacy keys + sprite frames.
 //
 // Both the static portraits (cards / picker) and the in-scene walking sprites are
 // now fully custom-drawn from the same per-character recipes in portraitArt.ts:
@@ -25,21 +25,21 @@ export interface CastMember {
 
 /** Selectable roster, in display order. */
 export const OFFICE_CAST: CastMember[] = [
-  { name: 'michael',  displayName: 'Michael',  shirt: '#5a6b8c', blurb: "World's best boss" },
-  { name: 'jim',      displayName: 'Jim',      shirt: '#6fa8dc', blurb: 'Salesman, prankster' },
-  { name: 'pam',      displayName: 'Pam',      shirt: '#9caf88', blurb: 'Receptionist, artist' },
-  { name: 'dwight',   displayName: 'Dwight',   shirt: '#b89b3e', blurb: 'Assistant (to the) RM' },
-  { name: 'kevin',    displayName: 'Kevin',    shirt: '#4a7ab5', blurb: 'Accounting' },
-  { name: 'angela',   displayName: 'Angela',   shirt: '#8a86a6', blurb: 'Head of accounting' },
-  { name: 'oscar',    displayName: 'Oscar',    shirt: '#7a4b6b', blurb: 'Accountant' },
-  { name: 'stanley',  displayName: 'Stanley',  shirt: '#8c5a4b', blurb: 'Sales, crossword' },
-  { name: 'phyllis',  displayName: 'Phyllis',  shirt: '#b08bbf', blurb: 'Sales' },
-  { name: 'andy',     displayName: 'Andy',     shirt: '#6fae6f', blurb: 'Cornell, a cappella' },
-  { name: 'kelly',    displayName: 'Kelly',    shirt: '#d16ba5', blurb: 'Customer service' },
-  { name: 'ryan',     displayName: 'Ryan',     shirt: '#3a3a44', blurb: 'The temp' },
-  { name: 'toby',     displayName: 'Toby',     shirt: '#9a8c5a', blurb: 'Human resources' },
-  { name: 'creed',    displayName: 'Creed',    shirt: '#6b7a4b', blurb: 'Quality assurance' },
-  { name: 'meredith', displayName: 'Meredith', shirt: '#b5544a', blurb: 'Supplier relations' },
+  { name: 'michael',  displayName: 'Jean Luc', shirt: '#c7464a', blurb: 'Captain, command' },
+  { name: 'jim',      displayName: 'Riker',    shirt: '#b83f45', blurb: 'First officer' },
+  { name: 'pam',      displayName: 'Deanna',   shirt: '#6a65aa', blurb: 'Insight and counsel' },
+  { name: 'dwight',   displayName: 'Data',     shirt: '#c99632', blurb: 'Operations' },
+  { name: 'kevin',    displayName: 'Geordi',   shirt: '#d6a637', blurb: 'Engineering' },
+  { name: 'angela',   displayName: 'Beverly',  shirt: '#3f7dbb', blurb: 'Medical support' },
+  { name: 'oscar',    displayName: 'Worf',     shirt: '#b8862e', blurb: 'Tactical and security' },
+  { name: 'stanley',  displayName: 'Miles',    shirt: '#c69233', blurb: 'Transport and systems' },
+  { name: 'phyllis',  displayName: 'Guinan',   shirt: '#7b5aa6', blurb: 'Listener, morale' },
+  { name: 'andy',     displayName: 'Wesley',   shirt: '#bd4b48', blurb: 'Flight cadet' },
+  { name: 'kelly',    displayName: 'Ro',       shirt: '#b64f5c', blurb: 'Conn specialist' },
+  { name: 'ryan',     displayName: 'Barclay',  shirt: '#d1a23c', blurb: 'Systems diagnostic' },
+  { name: 'toby',     displayName: 'Mott',     shirt: '#527fb8', blurb: 'Crew services' },
+  { name: 'creed',    displayName: 'Boothby',  shirt: '#6f8f5a', blurb: 'Groundskeeper emeritus' },
+  { name: 'meredith', displayName: 'Tasha',    shirt: '#bd4344', blurb: 'Security chief' },
 ];
 
 export const CAST_BY_NAME: Record<OfficeCharacterName, CastMember> =

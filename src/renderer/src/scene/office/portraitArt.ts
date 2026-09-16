@@ -1,4 +1,4 @@
-// Procedural portraits for The Office cast.
+// Procedural portraits for the Daystrom bridge cast.
 //
 // These are fully custom-drawn busts (NOT recolored LimeZu sprites): each
 // character is an explicit recipe layering skin → clothing → face → facial hair
@@ -55,6 +55,7 @@ function rect(buf: Buf, x0: number, y0: number, x1: number, y1: number, c: RGB):
 interface SkinPal { hi: RGB; base: RGB; sh: RGB; line: RGB; }
 const SKIN: Record<string, SkinPal> = {
   light: { hi: [255, 221, 189], base: [247, 201, 170], sh: [212, 158, 126], line: [168, 112, 82] },
+  pale:  { hi: [255, 232, 200], base: [232, 197, 154], sh: [184, 140, 96],  line: [132, 92, 58] },
   tan:   { hi: [232, 182, 136], base: [214, 162, 116], sh: [176, 126, 86],  line: [138, 92, 60] },
   brown: { hi: [180, 130, 94],  base: [158, 112, 78],  sh: [124, 86, 58],   line: [90, 60, 40] },
   dark:  { hi: [142, 98, 70],   base: [120, 80, 56],   sh: [94, 62, 42],    line: [64, 42, 28] },
@@ -288,7 +289,21 @@ function drawGlasses(buf: Buf): void {
 }
 
 // ─── clothing ────────────────────────────────────────────────────────────────
-type Cloth = 'suit' | 'dressshirt' | 'polo' | 'blouse' | 'cardigan' | 'sweater';
+type Cloth = 'suit' | 'dressshirt' | 'polo' | 'blouse' | 'cardigan' | 'sweater' | 'starfleet';
+const UNIFORM_BLACK: RGB = [24, 25, 34];
+const PIP: RGB = [238, 184, 72];
+const COMBADGE: RGB = [236, 190, 82];
+
+function drawCombadge(buf: Buf, x = 11, y = 22): void {
+  set(buf, x, y, COMBADGE);
+  set(buf, x + 1, y + 1, COMBADGE);
+  set(buf, x, y + 1, [238, 238, 218]);
+}
+
+function drawUniformPips(buf: Buf, count = 2): void {
+  for (let i = 0; i < count; i++) set(buf, 7 + i, 19, PIP);
+}
+
 function bodyShape(buf: Buf, col: RGB, heavy = false): void {
   const [, base, sh] = shades(col);
   const rows: [number, number, number][] = heavy
@@ -300,7 +315,7 @@ function bodyShape(buf: Buf, col: RGB, heavy = false): void {
 }
 function drawClothing(buf: Buf, kind: Cloth, c1: RGB, c2: RGB | undefined, tie: RGB | undefined, skin: string, heavy = false): void {
   const [hi, base, sh] = shades(c1);
-  bodyShape(buf, c1, heavy);
+  bodyShape(buf, kind === 'starfleet' ? UNIFORM_BLACK : c1, heavy);
   if (kind === 'suit') {
     const white: RGB = [238, 238, 236];
     for (const [x, y] of [[8, 19], [9, 19], [7, 20], [8, 20], [9, 20], [10, 20], [8, 21], [9, 21]] as const) set(buf, x, y, white);
@@ -326,6 +341,16 @@ function drawClothing(buf: Buf, kind: Cloth, c1: RGB, c2: RGB | undefined, tie: 
     for (const [x, y] of [[6, 19], [7, 19], [10, 19], [11, 19]] as const) set(buf, x, y, sh);
   } else if (kind === 'sweater') {
     for (const [x, y] of [[6, 19], [7, 19], [8, 19], [9, 19], [10, 19], [11, 19]] as const) set(buf, x, y, sh);
+  } else if (kind === 'starfleet') {
+    const [, black, blackSh] = shades(UNIFORM_BLACK);
+    const collar: RGB = [18, 18, 24];
+    for (let y = 19; y <= 22; y++) rect(buf, y === 19 ? 5 : 3, y, y === 19 ? 12 : 14, y, base);
+    for (let y = 23; y <= 27; y++) rect(buf, heavy ? 0 : 1, y, heavy ? 17 : 16, y, black);
+    rect(buf, 7, 19, 10, 20, collar);
+    rect(buf, 8, 20, 9, 24, blackSh);
+    for (let y = 22; y <= 27; y++) { set(buf, heavy ? 0 : 1, y, blackSh); set(buf, heavy ? 17 : 16, y, blackSh); }
+    drawUniformPips(buf, tie?.[0] ?? 2);
+    drawCombadge(buf, 12, 22);
   }
 }
 function collarNeck(buf: Buf, skin: string): void {
@@ -392,6 +417,15 @@ function drawSceneTorso(buf: Buf, r: Recipe, back: boolean): void {
     for (const [x, y] of [[6, 18], [7, 18], [10, 18], [11, 18]] as const) set(buf, x, y, sh);
   } else if (r.cloth === 'sweater') {
     for (const [x, y] of [[6, 18], [7, 18], [8, 18], [9, 18], [10, 18], [11, 18]] as const) set(buf, x, y, sh);
+  } else if (r.cloth === 'starfleet') {
+    const [, black, blackSh] = shades(UNIFORM_BLACK);
+    const collar: RGB = [18, 18, 24];
+    for (let y = 18; y <= 21; y++) rect(buf, y === 18 ? 5 : 3, y, y === 18 ? 12 : 14, y, base);
+    for (let y = 22; y <= 24; y++) rect(buf, r.heavy ? 2 : 4, y, r.heavy ? 15 : 13, y, black);
+    rect(buf, 7, 18, 10, 19, collar);
+    rect(buf, 8, 19, 9, 24, blackSh);
+    drawUniformPips(buf, r.tie?.[0] ?? 2);
+    drawCombadge(buf, 12, 21);
   }
 }
 
@@ -468,10 +502,25 @@ interface Recipe {
   skin: string; hairc: RGB; hair: HairStyle; hairargs?: HairArgs;
   cloth: Cloth; c1: RGB; c2?: RGB; tie?: RGB; pants?: RGB;
   brow?: Brow; mouth?: Mouth; blush?: boolean; facial?: Facial; glasses?: boolean;
+  visor?: boolean; ridges?: boolean;
   /** Bigger, lashed eyes for a more feminine, expressive face. */
   lashes?: boolean;
   /** Heavier build: chubby cheeks, a double chin, and a wider torso. */
   heavy?: boolean;
+}
+
+function drawVisor(buf: Buf): void {
+  const gold: RGB = [232, 176, 52], amber: RGB = [164, 104, 30], glow: RGB = [255, 220, 88];
+  rect(buf, 4, 8, 12, 10, amber);
+  for (let x = 4; x <= 12; x++) set(buf, x, 8, gold);
+  for (const x of [5, 8, 11]) set(buf, x, 9, glow);
+  set(buf, 3, 9, amber); set(buf, 13, 9, amber);
+}
+
+function drawForeheadRidges(buf: Buf, skin: string): void {
+  const s = SKIN[skin];
+  for (const [x, y] of [[7, 5], [8, 4], [9, 4], [10, 5], [7, 6], [9, 6], [11, 6], [8, 7], [10, 7]] as const) set(buf, x, y, s.line);
+  set(buf, 8, 5, s.sh); set(buf, 9, 5, s.sh);
 }
 
 // Puff the lower face into round cheeks + a double chin so a character reads as
@@ -491,21 +540,21 @@ function drawHeavyFace(buf: Buf, skin: string): void {
 }
 
 const RECIPES: Record<OfficeCharacterName, Recipe> = {
-  michael:  { skin: 'light', hairc: [58, 42, 28],   hair: 'styleShort',  hairargs: { part: 'L' }, cloth: 'suit', c1: [58, 63, 74], tie: [170, 58, 58], brow: 'flat', mouth: 'smile' },
-  jim:      { skin: 'light', hairc: [92, 60, 34],   hair: 'styleFloppy', cloth: 'dressshirt', c1: [172, 196, 224], tie: [120, 130, 150], brow: 'flat', mouth: 'smile' },
-  pam:      { skin: 'light', hairc: [120, 76, 42],  hair: 'styleFrame',  hairargs: { length: 18, vol: 2 }, cloth: 'cardigan', c1: [236, 174, 192], c2: [244, 242, 238], brow: 'soft', mouth: 'smile', blush: true, lashes: true },
-  dwight:   { skin: 'light', hairc: [64, 48, 28],   hair: 'styleShort',  hairargs: { part: 'L', recede: 1 }, cloth: 'dressshirt', c1: [184, 155, 62], tie: [120, 82, 46], glasses: true, brow: 'angry', mouth: 'neutral' },
-  kevin:    { skin: 'light', hairc: [58, 44, 30],   hair: 'styleBald',   cloth: 'polo', c1: [110, 140, 180], c2: [90, 120, 160], brow: 'flat', mouth: 'neutral', heavy: true },
-  angela:   { skin: 'light', hairc: [186, 154, 90], hair: 'styleBun',    cloth: 'cardigan', c1: [150, 146, 170], c2: [235, 233, 226], brow: 'angry', mouth: 'frown', lashes: true },
-  oscar:    { skin: 'tan',   hairc: [28, 22, 18],   hair: 'styleShort',  hairargs: { part: 'L' }, cloth: 'sweater', c1: [122, 60, 74], brow: 'flat', mouth: 'smile' },
-  stanley:  { skin: 'dark',  hairc: [60, 54, 48],   hair: 'styleRecede', cloth: 'dressshirt', c1: [150, 120, 86], tie: [120, 78, 52], glasses: true, facial: 'mustache', brow: 'flat', mouth: 'neutral', heavy: true },
-  phyllis:  { skin: 'light', hairc: [196, 162, 110], hair: 'styleCurly', cloth: 'blouse', c1: [202, 160, 192], glasses: true, brow: 'soft', mouth: 'smile', lashes: true, heavy: true },
-  andy:     { skin: 'light', hairc: [74, 51, 32],   hair: 'styleShort',  hairargs: { part: 'R' }, cloth: 'polo', c1: [176, 65, 58], c2: [150, 50, 46], brow: 'raised', mouth: 'smile' },
-  kelly:    { skin: 'tan',   hairc: [24, 18, 22],   hair: 'styleFrame',  hairargs: { length: 20, vol: 1 }, cloth: 'blouse', c1: [212, 90, 158], brow: 'soft', mouth: 'smile', blush: true, lashes: true },
-  ryan:     { skin: 'light', hairc: [42, 32, 24],   hair: 'styleSpiky',  cloth: 'suit', c1: [58, 58, 68], tie: [40, 40, 50], brow: 'flat', mouth: 'neutral' },
-  toby:     { skin: 'light', hairc: [106, 90, 66],  hair: 'styleShort',  hairargs: { part: 'L', recede: 1 }, cloth: 'dressshirt', c1: [150, 150, 120], facial: 'mustacheSm', brow: 'soft', mouth: 'frown' },
-  creed:    { skin: 'light', hairc: [170, 166, 156], hair: 'styleBald',   cloth: 'dressshirt', c1: [126, 130, 96], facial: 'stubble', brow: 'flat', mouth: 'neutral' },
-  meredith: { skin: 'light', hairc: [154, 82, 46],  hair: 'styleMessy',  hairargs: { length: 15 }, cloth: 'blouse', c1: [176, 86, 74], brow: 'raised', mouth: 'smile', lashes: true },
+  michael:  { skin: 'light', hairc: [56, 42, 34],   hair: 'styleBald',   hairargs: { recede: 1 }, cloth: 'starfleet', c1: [188, 56, 62], tie: [4, 0, 0], brow: 'raised', mouth: 'neutral' },
+  jim:      { skin: 'light', hairc: [62, 40, 28],   hair: 'styleShort',  hairargs: { part: 'R' }, cloth: 'starfleet', c1: [178, 54, 58], tie: [3, 0, 0], brow: 'flat', mouth: 'smile', facial: 'stubble' },
+  pam:      { skin: 'light', hairc: [70, 48, 88],   hair: 'styleFrame',  hairargs: { length: 20, vol: 2 }, cloth: 'starfleet', c1: [106, 94, 174], tie: [2, 0, 0], brow: 'soft', mouth: 'smile', blush: true, lashes: true },
+  dwight:   { skin: 'pale',  hairc: [236, 216, 168], hair: 'styleShort', hairargs: { part: 'L' }, cloth: 'starfleet', c1: [210, 156, 52], tie: [2, 0, 0], brow: 'raised', mouth: 'neutral' },
+  kevin:    { skin: 'brown', hairc: [32, 26, 24],   hair: 'styleShort',  hairargs: { part: 'L' }, cloth: 'starfleet', c1: [214, 160, 50], tie: [2, 0, 0], brow: 'flat', mouth: 'smile', visor: true },
+  angela:   { skin: 'light', hairc: [190, 88, 54],  hair: 'styleFrame',  hairargs: { length: 18, vol: 1 }, cloth: 'starfleet', c1: [66, 120, 184], tie: [3, 0, 0], brow: 'soft', mouth: 'smile', lashes: true },
+  oscar:    { skin: 'brown', hairc: [42, 28, 22],   hair: 'styleFrame',  hairargs: { length: 17, vol: 1 }, cloth: 'starfleet', c1: [198, 142, 42], tie: [2, 0, 0], brow: 'angry', mouth: 'neutral', ridges: true },
+  stanley:  { skin: 'dark',  hairc: [52, 48, 44],   hair: 'styleRecede', cloth: 'starfleet', c1: [204, 150, 46], tie: [2, 0, 0], glasses: true, facial: 'mustache', brow: 'flat', mouth: 'neutral', heavy: true },
+  phyllis:  { skin: 'light', hairc: [70, 54, 82],   hair: 'styleFrame',  hairargs: { length: 20, vol: 2 }, cloth: 'starfleet', c1: [116, 78, 148], tie: [1, 0, 0], brow: 'soft', mouth: 'smile', lashes: true, heavy: true },
+  andy:     { skin: 'light', hairc: [74, 51, 32],   hair: 'styleShort',  hairargs: { part: 'R' }, cloth: 'starfleet', c1: [184, 62, 58], tie: [1, 0, 0], brow: 'raised', mouth: 'smile' },
+  kelly:    { skin: 'tan',   hairc: [24, 18, 22],   hair: 'styleFrame',  hairargs: { length: 18, vol: 1 }, cloth: 'starfleet', c1: [178, 66, 84], tie: [2, 0, 0], brow: 'soft', mouth: 'smile', blush: true, lashes: true },
+  ryan:     { skin: 'light', hairc: [42, 32, 24],   hair: 'styleSpiky',  cloth: 'starfleet', c1: [208, 156, 58], tie: [1, 0, 0], brow: 'flat', mouth: 'neutral' },
+  toby:     { skin: 'light', hairc: [96, 78, 58],   hair: 'styleShort',  hairargs: { part: 'L', recede: 1 }, cloth: 'starfleet', c1: [78, 126, 180], tie: [1, 0, 0], facial: 'mustacheSm', brow: 'soft', mouth: 'neutral' },
+  creed:    { skin: 'light', hairc: [170, 166, 156], hair: 'styleBald',  cloth: 'sweater', c1: [98, 124, 74], facial: 'stubble', brow: 'flat', mouth: 'smile' },
+  meredith: { skin: 'light', hairc: [154, 82, 46],  hair: 'styleMessy',  hairargs: { length: 15 }, cloth: 'starfleet', c1: [176, 58, 62], tie: [2, 0, 0], brow: 'raised', mouth: 'smile', lashes: true },
 };
 
 /** The face/hair group (head → face → facial hair → hair → glasses), no clothing. */
@@ -516,11 +565,14 @@ function drawHeadGroup(buf: Buf, r: Recipe): void {
   drawFace(buf, r.skin, r.brow ?? 'flat', r.mouth ?? 'neutral', r.blush ?? false, r.lashes ?? false);
   if (r.facial) drawFacial(buf, r.facial, r.hairc);
   HAIR_FNS[r.hair](buf, r.hairc, skinBase, r.hairargs ?? {});
+  if (r.ridges) drawForeheadRidges(buf, r.skin);
   if (r.glasses) drawGlasses(buf);
+  if (r.visor) drawVisor(buf);
 }
 
 function defaultPants(r: Recipe): RGB {
   if (r.pants) return r.pants;
+  if (r.cloth === 'starfleet') return UNIFORM_BLACK;
   return r.cloth === 'suit' ? shades(r.c1)[2] : [54, 56, 70];
 }
 
