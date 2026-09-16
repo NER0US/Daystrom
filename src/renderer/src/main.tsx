@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { App } from './App';
 import brandLogo from '@brand/logo.png?url';
 import './design/global.css';
+import './design/daystrom.css';
+import './design/skin';
 import './i18n';
 
 const favicon = document.createElement('link');
@@ -15,7 +17,7 @@ const splashMark = document.querySelector('#cth-splash .mk');
 if (splashMark) {
   const img = document.createElement('img');
   img.src = brandLogo;
-  img.alt = 'Munder Difflin';
+  img.alt = 'Daystrom Command';
   img.style.cssText = 'height:56px;width:auto;display:block';
   splashMark.replaceWith(img);
 }

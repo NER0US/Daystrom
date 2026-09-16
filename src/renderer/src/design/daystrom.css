@@ -1,0 +1,214 @@
+/* Daystrom Command visual skin. Keep every override scoped to the Daystrom skin. */
+
+:root[data-cth-skin='daystrom'] {
+  --daystrom-space: #0B0A0D;
+  --daystrom-console: #17151C;
+  --daystrom-bridge-sand: #C9B99A;
+  --daystrom-hull-stone: #928B83;
+  --daystrom-console-cream: #E8DDC8;
+  --daystrom-command-coral: #D96B5F;
+  --daystrom-operations-amber: #E5A64A;
+  --daystrom-systems-gold: #D6C06F;
+  --daystrom-science-lavender: #9C8BC4;
+  --daystrom-comms-rose: #C77B9B;
+  --daystrom-medical-blue: #6E9EAE;
+  --daystrom-ready-green: #79A77A;
+  --daystrom-interlock-red: #B54E52;
+
+  --cth-coral: var(--daystrom-command-coral);
+  --cth-mint: var(--daystrom-ready-green);
+  --cth-sky: var(--daystrom-medical-blue);
+  --cth-lemon: var(--daystrom-operations-amber);
+  --cth-lilac: var(--daystrom-science-lavender);
+  --cth-peach: var(--daystrom-comms-rose);
+  --cth-status-idle: var(--daystrom-hull-stone);
+  --cth-status-thinking: var(--daystrom-science-lavender);
+  --cth-status-working: var(--daystrom-operations-amber);
+  --cth-status-waiting: var(--daystrom-comms-rose);
+  --cth-status-blocked: var(--daystrom-interlock-red);
+  --cth-status-success: var(--daystrom-ready-green);
+  --cth-status-compacting: var(--daystrom-science-lavender);
+  --cth-status-looping: var(--daystrom-command-coral);
+  --cth-status-typing: var(--daystrom-systems-gold);
+}
+
+:root[data-cth-skin='daystrom'][data-cth-theme='dark'] {
+  --cth-cream-50: #0B0A0D;
+  --cth-cream-100: #17151C;
+  --cth-cream-200: #242128;
+  --cth-cream-300: #343039;
+  --cth-paper-100: #111015;
+  --cth-paper-200: #1D1A21;
+  --cth-ink-900: #E8DDC8;
+  --cth-ink-700: #C9B99A;
+  --cth-ink-500: #AAA29A;
+  --cth-ink-300: #77717E;
+  --cth-ink-100: #3D3942;
+  --cth-coral-light: #3D2324;
+  --cth-mint-light: #223326;
+  --cth-sky-light: #213139;
+  --cth-lemon-light: #3B3020;
+  --cth-lilac-light: #302941;
+  --cth-peach-light: #3A2931;
+  --cth-panel-border: inset 0 0 0 1px #77717E;
+  --cth-panel-border-inset: inset 0 0 0 1px #3D3942;
+  --cth-panel-border-terminal: inset 0 0 0 1px #77717E;
+  --cth-panel-border-dialog: inset 0 0 0 1px #AAA29A;
+  --cth-shadow-hard: 4px 4px 0 rgba(0, 0, 0, 0.5);
+}
+
+:root[data-cth-skin='daystrom'][data-cth-theme='light'] {
+  --cth-cream-50: #EEE6D8;
+  --cth-cream-100: #E8DDC8;
+  --cth-cream-200: #D9CBB5;
+  --cth-cream-300: #C9B99A;
+  --cth-paper-100: #F5EFE5;
+  --cth-paper-200: #DDD2C0;
+  --cth-ink-900: #17151C;
+  --cth-ink-700: #332F38;
+  --cth-ink-500: #5E5864;
+  --cth-ink-300: #827B84;
+  --cth-ink-100: #B9AEA3;
+}
+
+/* Bridge-wide surface treatment. */
+:root[data-cth-skin='daystrom'] body {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(201,185,154,.14), transparent 28%),
+    linear-gradient(180deg, #161319 0%, var(--daystrom-space) 100%);
+}
+
+/* Replace the office-brand title treatment with a Daystrom bridge header. */
+:root[data-cth-skin='daystrom'] .cth-titlebar-drag {
+  position: relative;
+  background: #0b0a0d !important;
+  border-bottom: 0 !important;
+  min-height: 42px !important;
+  height: 42px !important;
+  padding-left: 104px !important;
+  overflow: hidden;
+}
+
+:root[data-cth-skin='daystrom'] .cth-titlebar-drag > img {
+  display: none !important;
+}
+
+:root[data-cth-skin='daystrom'] .cth-titlebar-drag::before {
+  content: 'DAYSTROM COMMAND';
+  flex: 0 0 auto;
+  min-width: 188px;
+  padding: 7px 18px 6px 22px;
+  border-radius: 18px 0 0 18px;
+  background: var(--daystrom-operations-amber);
+  color: #0b0a0d;
+  font-family: var(--cth-font-display);
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: .04em;
+  box-shadow: 76px 0 0 var(--daystrom-command-coral), 126px 0 0 var(--daystrom-science-lavender);
+}
+
+:root[data-cth-skin='daystrom'] .cth-titlebar-drag::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  bottom: 6px;
+  width: min(36vw, 420px);
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(90deg,
+    var(--daystrom-science-lavender) 0 20%, transparent 20% 22%,
+    var(--daystrom-comms-rose) 22% 47%, transparent 47% 49%,
+    var(--daystrom-operations-amber) 49% 76%, transparent 76% 78%,
+    var(--daystrom-command-coral) 78% 100%);
+  opacity: .9;
+}
+
+/* Command Center: use the existing component tree but make it read as a bridge console. */
+:root[data-cth-skin='daystrom'] div:has(> .cth-tabbar) {
+  background: var(--daystrom-console) !important;
+  border-radius: 22px 0 0 22px;
+  box-shadow:
+    inset 0 0 0 1px #5d5664,
+    inset 8px 0 0 var(--daystrom-bridge-sand),
+    -10px 0 28px rgba(0,0,0,.34);
+}
+
+:root[data-cth-skin='daystrom'] div:has(> .cth-tabbar) > div:first-child {
+  background: #0c0b0e !important;
+  border-bottom: 6px solid var(--daystrom-operations-amber) !important;
+  padding-left: 18px !important;
+}
+
+:root[data-cth-skin='daystrom'] .cth-tabbar {
+  gap: 5px !important;
+  padding: 7px 10px 8px 18px !important;
+  background: #0c0b0e !important;
+  border-bottom: 0 !important;
+}
+
+:root[data-cth-skin='daystrom'] .cth-tabbar button {
+  min-height: 27px;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  font-family: var(--cth-font-ui) !important;
+  font-size: 11px !important;
+  font-weight: 750 !important;
+  letter-spacing: .025em;
+  text-transform: uppercase;
+  background: var(--daystrom-hull-stone) !important;
+  color: #0b0a0d !important;
+  transition: filter 100ms ease, transform 100ms ease;
+}
+
+:root[data-cth-skin='daystrom'] .cth-tabbar button:nth-child(6n+1) { background: var(--daystrom-operations-amber) !important; }
+:root[data-cth-skin='daystrom'] .cth-tabbar button:nth-child(6n+2) { background: var(--daystrom-command-coral) !important; }
+:root[data-cth-skin='daystrom'] .cth-tabbar button:nth-child(6n+3) { background: var(--daystrom-science-lavender) !important; }
+:root[data-cth-skin='daystrom'] .cth-tabbar button:nth-child(6n+4) { background: var(--daystrom-comms-rose) !important; }
+:root[data-cth-skin='daystrom'] .cth-tabbar button:nth-child(6n+5) { background: var(--daystrom-medical-blue) !important; }
+:root[data-cth-skin='daystrom'] .cth-tabbar button:nth-child(6n+6) { background: var(--daystrom-systems-gold) !important; }
+:root[data-cth-skin='daystrom'] .cth-tabbar button:hover { filter: brightness(1.12); transform: translateY(-1px); }
+:root[data-cth-skin='daystrom'] .cth-tabbar button:focus-visible { outline: 2px solid var(--daystrom-console-cream); outline-offset: 2px; }
+
+/* Existing pixel controls become soft, tactile console controls. */
+:root[data-cth-skin='daystrom'] button,
+:root[data-cth-skin='daystrom'] input,
+:root[data-cth-skin='daystrom'] textarea,
+:root[data-cth-skin='daystrom'] select {
+  border-radius: 8px;
+}
+
+:root[data-cth-skin='daystrom'] button {
+  letter-spacing: .01em;
+}
+
+/* The splitter reads like the vertical beige bridge frame from the approved concept. */
+:root[data-cth-skin='daystrom'] [class*='splitter' i] {
+  background: var(--daystrom-bridge-sand) !important;
+}
+
+/* Terminals/data panes stay black, like illuminated bridge displays. */
+:root[data-cth-skin='daystrom'] .xterm,
+:root[data-cth-skin='daystrom'] [class*='terminal' i] {
+  border-radius: 10px;
+}
+
+/* Small LCARS-style status rail at the bottom edge of the app. */
+:root[data-cth-skin='daystrom'] #root::after {
+  content: '';
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 6px;
+  z-index: 9999;
+  height: 4px;
+  pointer-events: none;
+  border-radius: 999px;
+  background: linear-gradient(90deg,
+    var(--daystrom-command-coral) 0 14%, transparent 14% 15%,
+    var(--daystrom-operations-amber) 15% 38%, transparent 38% 39%,
+    var(--daystrom-science-lavender) 39% 58%, transparent 58% 59%,
+    var(--daystrom-comms-rose) 59% 76%, transparent 76% 77%,
+    var(--daystrom-medical-blue) 77% 100%);
+  opacity: .74;
+}

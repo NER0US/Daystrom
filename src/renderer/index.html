@@ -2,38 +2,60 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Munder Difflin</title>
+    <title>Daystrom Command</title>
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://api.openai.com https://*.openai.com wss://api.openai.com wss://*.openai.com; media-src 'self' blob: mediastream:;" />
-    <!-- v0.3.4 type revamp: Press Start 2P stays as the BRAND display face
-         (small caps labels only); body/UI moves to Inter and code/terminal to
-         JetBrains Mono. The pixel body fonts (Pixelify/VT323) read as toy-like
-         and strained at data-dense sizes.
-         v0.4.6: these three faces are BUNDLED (src/renderer/src/design/fonts.css)
-         rather than fetched from fonts.googleapis.com, which is blocked in
-         mainland China. The CSP above no longer allows either Google font host. -->
     <style>
       #cth-splash {
         position: fixed; inset: 0; display: flex; flex-direction: column;
-        align-items: center; justify-content: center; gap: 14px;
-        background: #FFF8E7; color: #1A1320;
+        align-items: center; justify-content: center; gap: 16px;
+        background:
+          radial-gradient(circle at 50% 32%, rgba(201,185,154,.12), transparent 30%),
+          #0B0A0D;
+        color: #E8DDC8;
         font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        overflow: hidden;
       }
+      #cth-splash::before,
+      #cth-splash::after {
+        content: ""; position: absolute; left: 8%; right: 8%; height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(90deg,
+          #E5A64A 0 24%, transparent 24% 26%,
+          #D96B5F 26% 48%, transparent 48% 50%,
+          #9C8BC4 50% 72%, transparent 72% 74%,
+          #C77B9B 74% 100%);
+      }
+      #cth-splash::before { top: 12%; }
+      #cth-splash::after { bottom: 12%; transform: scaleX(.72); }
       #cth-splash .mk {
-        display: grid; place-items: center; width: 56px; height: 56px;
-        background: #6E1423; color: #F4F1EA; border: 4px solid #4A0D17;
-        font-family: "Press Start 2P", monospace; font-size: 16px; letter-spacing: -2px;
-        box-shadow: 4px 4px 0 rgba(26,19,32,0.25);
+        display: grid; place-items: center; width: 96px; height: 58px;
+        background: #E5A64A; color: #0B0A0D;
+        border-radius: 30px 4px 4px 30px;
+        font-family: "Press Start 2P", monospace; font-size: 13px;
+        box-shadow: 44px 0 0 #D96B5F, 72px 0 0 #9C8BC4;
       }
-      #cth-splash .title { font-family: "Press Start 2P", monospace; font-size: 13px; }
-      #cth-splash .hint { font-size: 15px; color: #6B5878; }
+      #cth-splash .title {
+        margin-top: 8px;
+        font-family: "Press Start 2P", monospace;
+        font-size: 16px; letter-spacing: .06em;
+      }
+      #cth-splash .hint {
+        font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
+        color: #C9B99A;
+      }
+      #cth-splash .credit {
+        position: absolute; bottom: 4%;
+        font-size: 11px; color: #77717E; letter-spacing: .04em;
+      }
     </style>
   </head>
   <body>
     <div id="root">
       <div id="cth-splash">
-        <div class="mk">MD</div>
-        <div class="title">MUNDER DIFFLIN</div>
-        <div class="hint">booting the hive…</div>
+        <div class="mk">DC</div>
+        <div class="title">DAYSTROM COMMAND</div>
+        <div class="hint">bringing bridge systems online…</div>
+        <div class="credit">Built from Munder Difflin by Chaitanya Giri</div>
       </div>
     </div>
     <script type="module" src="./src/main.tsx"></script>
