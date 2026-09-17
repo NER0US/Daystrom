@@ -36,17 +36,24 @@ body {
 }
 .daystrom-shell .cth-titlebar-drag {
   position: relative;
-  background: var(--cth-lcars-space) !important;
+  background:
+    linear-gradient(90deg,
+      transparent 0 46%, var(--cth-lcars-orange) 46% 63%, transparent 63% 64%,
+      var(--cth-lcars-lavender) 64% 78%, transparent 78%),
+    var(--cth-lcars-space) !important;
   border-bottom: 3px solid var(--cth-lcars-orange) !important;
 }
 .daystrom-shell .cth-titlebar-drag::before {
-  content: 'DAYSTROM // COMMAND BRIDGE';
+  content: 'DAYSTROM  •  NCC-1701-D  •  COMMAND BRIDGE';
   position: absolute;
-  left: 8px;
-  top: 10px;
+  left: 112px;
+  top: 9px;
+  padding: 1px 10px 2px 8px;
+  background: var(--cth-lcars-space);
   color: var(--cth-lcars-peach);
   font: 8px/12px var(--cth-font-display);
-  letter-spacing: 1px;
+  letter-spacing: .7px;
+  white-space: nowrap;
 }
 .daystrom-shell .cth-titlebar-drag img { display: none !important; }
 .daystrom-shell .cth-titlebar-drag button {
@@ -61,8 +68,9 @@ body {
 }
 .daystrom-shell > div:nth-of-type(2) { padding: 10px !important; gap: 10px !important; }
 .daystrom-shell > div:nth-of-type(2) > div:first-child {
+  position: relative;
   border: 3px solid var(--cth-lcars-orange);
-  border-radius: 28px 8px 8px 28px;
+  border-radius: 30px 8px 8px 30px;
   overflow: hidden;
   background: radial-gradient(circle at 50% 40%, #27334c 0%, var(--cth-lcars-space) 75%);
 }
@@ -71,9 +79,23 @@ body {
   position: absolute;
   inset: 14px;
   border: 1px solid rgba(204, 153, 255, .45);
-  border-radius: 48% 48% 12px 12px;
+  border-radius: 50% 50% 14px 14px;
   pointer-events: none;
   z-index: 2;
+}
+.daystrom-shell > div:nth-of-type(2) > div:first-child::after {
+  content: '';
+  position: absolute;
+  inset: 8px 8px auto;
+  height: 8px;
+  border-radius: 5px;
+  background: linear-gradient(90deg,
+    var(--cth-lcars-orange) 0 9%, transparent 9% 10%,
+    var(--cth-lcars-peach) 10% 42%, transparent 42% 43%,
+    var(--cth-lcars-lavender) 43% 74%, transparent 74% 75%,
+    var(--cth-lcars-blue) 75% 100%);
+  pointer-events: none;
+  z-index: 3;
 }
 .daystrom-shell > div:nth-of-type(2) > div:nth-child(3) {
   border: 3px solid var(--cth-lcars-lavender);

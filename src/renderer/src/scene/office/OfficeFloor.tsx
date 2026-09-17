@@ -288,6 +288,20 @@ export function OfficeFloor() {
       const mapRenderer = new TiledMapRenderer(resolveThemeMap(theme), tilesetTextures);
       world.addChild(mapRenderer.getContainer());
       const charLayer = mapRenderer.getCharacterContainer();
+      const isDaystrom = theme.id === 'daystrom';
+      if (isDaystrom) {
+        // Keep the office map as the invisible interaction model (collision,
+        // paths and named seats), but replace its tiles with a bridge set. This
+        // leaves every live floor behaviour intact while giving Daystrom its
+        // own composition rather than an office inside an LCARS border.
+        for (const layer of mapRenderer.getContainer().children) {
+          if (layer !== charLayer) layer.visible = false;
+        }
+        const bridge = paintDaystromBridge(mapRenderer.width * mapRenderer.tileSize,
+          mapRenderer.height * mapRenderer.tileSize);
+        bridge.zIndex = -10_000;
+        charLayer.addChild(bridge);
+      }
       const tileCount = mapRenderer.getContainer().children.reduce(
         (n, c) => n + ((c as Container).children?.length ?? 0), 0);
       console.log(`[OfficeFloor] map ${mapRenderer.width}x${mapRenderer.height}, ${tileCount} tile sprites rendered`);
@@ -303,6 +317,7 @@ export function OfficeFloor() {
       // everything that wakes the hive without you, schedules first among them.
       const calTs = mapRenderer.tileSize;
       const calG = new Graphics();
+      calG.visible = !isDaystrom;
       calG.eventMode = 'static';
       calG.cursor = 'pointer';
       calG.position.set(theme.anchors.calendar.x * calTs + 8, theme.anchors.calendar.y * calTs + 5);
@@ -342,6 +357,11 @@ export function OfficeFloor() {
         seatTiles.push({ x: t.x, y: t.y });
       };
       for (const name of theme.primarySeatNames) addSeat(mapRenderer.getSpawnPoint(name));
+      if (isDaystrom) {
+        const stations = paintDaystromStations(seatTiles, mapRenderer.tileSize);
+        stations.zIndex = -9_000;
+        charLayer.addChild(stations);
+      }
       const addZoneSeats = (zone: string) => {
         const z = mapRenderer.getZone(zone);
         if (!z) return;
@@ -452,6 +472,7 @@ export function OfficeFloor() {
 
       const ts0 = mapRenderer.tileSize;
       const trayG = new Graphics();
+      trayG.visible = !isDaystrom;
       trayG.eventMode = 'none';
       trayG.position.set(TRAY_TILE.x * ts0, TRAY_TILE.y * ts0);
       trayG.zIndex = (TRAY_TILE.y + 1) * ts0;
@@ -466,6 +487,7 @@ export function OfficeFloor() {
       drawTray();
 
       const sinkG = new Graphics();
+      sinkG.visible = !isDaystrom;
       sinkG.eventMode = 'none';
       sinkG.position.set(SINK_TILE.x * ts0, SINK_TILE.y * ts0);
       sinkG.zIndex = (SINK_TILE.y + 1) * ts0;
@@ -491,6 +513,7 @@ export function OfficeFloor() {
       drawSink(0);
 
       const machineG = new Graphics(); // steam over the counter machine while brewing
+      machineG.visible = !isDaystrom;
       machineG.eventMode = 'none';
       machineG.position.set(26 * ts0, 17 * ts0);
       machineG.zIndex = 19 * ts0;
@@ -797,7 +820,7 @@ export function OfficeFloor() {
       // Plants get watered, windows opened for a breeze, the dispenser poured,
       // the fridge inspected, the shelf browsed, scrap paper binned. Every spot
       // has a stand tile + facing; `fx` anchors a little ambient animation.
-      const ERRAND_SPOTS: ErrandSpot[] = theme.errandSpots;
+      const ERRAND_SPOTS: ErrandSpot[] = isDaystrom ? [] : theme.errandSpots;
       const errandTaken: (string | null)[] = new Array(ERRAND_SPOTS.length).fill(null);
       // Lazily-created ambient fx layer per active errand spot.
       const errandFx = new Map<number, Graphics>();
@@ -1029,6 +1052,7 @@ export function OfficeFloor() {
       interface BoardTask { status: string; assignee?: string }
       const tsB = mapRenderer.tileSize;
       const boardG = new Graphics();
+      boardG.visible = !isDaystrom;
       boardG.eventMode = 'static';
       boardG.cursor = 'pointer';
       boardG.position.set(BOARD_TILE.x * tsB + BOARD_CENTER_PAD, BOARD_TILE.y * tsB);
@@ -1120,6 +1144,7 @@ export function OfficeFloor() {
       // intercepts while agents run → the "Quitting now?" dialog with its
       // closing-time option). The office clock literally opens quitting time.
       const clockG = new Graphics();
+      clockG.visible = !isDaystrom;
       clockG.eventMode = 'static';
       clockG.cursor = 'pointer';
       clockG.position.set(theme.anchors.clock.x * ts0, theme.anchors.clock.y * ts0);
@@ -1138,6 +1163,7 @@ export function OfficeFloor() {
       // ASK ME tab, where the human reads the questions, answers, and the
       // answers flow back to the god (documented on the card itself).
       const askG = new Graphics();
+      askG.visible = !isDaystrom;
       askG.eventMode = 'static';
       askG.cursor = 'pointer';
       askG.position.set(14 * tsB + 25, 10 * tsB);
@@ -1409,7 +1435,7 @@ export function OfficeFloor() {
         // beside the monitor, exactly where the tileset's baked-in mug used
         // to sit before we cleared it (desks start clean now; cups only exist
         // where an agent actually carried one).
-        if (mapRenderer.gidAt('furniture-above', seatTile.x, seatTile.y - 2) === theme.monitor.offTopLeftGid) {
+        if (!isDaystrom && mapRenderer.gidAt('furniture-above', seatTile.x, seatTile.y - 2) === theme.monitor.offTopLeftGid) {
           const top = { x: seatTile.x, y: seatTile.y - 2 };
           rt.screen = new DeskScreen(mapRenderer, top, theme.monitor);
           charLayer.addChild(rt.screen.container);
@@ -1781,6 +1807,95 @@ export function OfficeFloor() {
       }}
     />
   );
+}
+
+/** Enterprise-D-inspired bridge shell. The underlying office map still owns
+ * navigation and seats; this layer is presentation only and receives no input. */
+function paintDaystromBridge(width: number, height: number): Graphics {
+  const g = new Graphics();
+  g.eventMode = 'none';
+
+  // Deep-space shell and the broad, warm bridge architecture.
+  g.rect(0, 0, width, height).fill(0x070b15);
+  g.roundRect(8, 8, width - 16, height - 16, 28).fill(0x151d2d)
+    .stroke({ color: 0xff9966, width: 4 });
+  g.roundRect(20, 20, width - 40, height - 40, 24).fill(0x273247)
+    .stroke({ color: 0xcc99ff, width: 2, alpha: 0.7 });
+
+  // Forward viewport: space, stars and an LCARS tactical readout.
+  const vx = width * 0.2, vy = 30, vw = width * 0.6, vh = height * 0.22;
+  g.roundRect(vx - 8, vy - 8, vw + 16, vh + 16, 16).fill(0xc9b9a5);
+  g.roundRect(vx, vy, vw, vh, 11).fill(0x02050e)
+    .stroke({ color: 0xffcc99, width: 3 });
+  const stars = [
+    [0.07, .28], [.13, .7], [.21, .17], [.31, .55], [.39, .3], [.48, .76],
+    [.56, .14], [.63, .46], [.72, .68], [.81, .22], [.9, .54], [.95, .34],
+  ];
+  for (const [sx, sy] of stars) g.circle(vx + vw * sx, vy + vh * sy, 1).fill(0x99ccff);
+  g.ellipse(vx + vw * .5, vy + vh * .48, vw * .18, vh * .24)
+    .stroke({ color: 0xcc99ff, width: 2, alpha: .65 });
+  g.ellipse(vx + vw * .5, vy + vh * .48, vw * .1, vh * .12)
+    .stroke({ color: 0xff9966, width: 2, alpha: .75 });
+
+  // Side bulkheads and inset LCARS status rails.
+  g.poly([20, 80, vx - 12, 96, vx - 12, height - 55, 20, height - 28])
+    .fill(0xb7aa9a).stroke({ color: 0x665c62, width: 3 });
+  g.poly([width - 20, 80, vx + vw + 12, 96, vx + vw + 12, height - 55, width - 20, height - 28])
+    .fill(0xb7aa9a).stroke({ color: 0x665c62, width: 3 });
+  for (const side of [30, width - 42]) {
+    g.roundRect(side, 106, 12, height - 166, 6).fill(0x090d18);
+    for (let y = 112, i = 0; y < height - 66; y += 18, i++) {
+      g.roundRect(side + 2, y, 8, 12, 3).fill(i % 2 ? 0xcc99ff : 0xff9966);
+    }
+  }
+
+  // Layered oval deck and command dais establish the bridge's focal axis.
+  g.ellipse(width / 2, height * .63, width * .37, height * .27).fill(0x6d7180)
+    .stroke({ color: 0xc9b9a5, width: 5 });
+  g.ellipse(width / 2, height * .63, width * .28, height * .19).fill(0x8e6268)
+    .stroke({ color: 0xd6b6a5, width: 3 });
+  g.ellipse(width / 2, height * .63, width * .16, height * .1).fill(0x5c6070);
+
+  // LCARS elbows anchor the scene without narrowing the usable floor.
+  g.roundRect(8, 8, 54, 18, 9).fill(0xff9966);
+  g.rect(52, 8, width * .3, 18).fill(0xff9966);
+  g.roundRect(width - 62, 8, 54, 18, 9).fill(0xcc99ff);
+  g.rect(width * .7, 8, width * .2, 18).fill(0xcc99ff);
+  g.roundRect(8, height - 25, width * .28, 17, 8).fill(0xcc99ff);
+  g.roundRect(width * .36, height - 25, width * .42, 17, 8).fill(0xff9966);
+  g.roundRect(width * .8, height - 25, width * .18 - 8, 17, 8).fill(0x99ccff);
+  return g;
+}
+
+/** Consoles are drawn around the exact live seat anchors, so crew sprites read
+ * as stationed operators even though their IDs and movement targets are unchanged. */
+function paintDaystromStations(seats: readonly Tile[], tileSize: number): Graphics {
+  const g = new Graphics();
+  g.eventMode = 'none';
+  seats.forEach((seat, index) => {
+    const x = seat.x * tileSize + tileSize / 2;
+    const y = seat.y * tileSize + tileSize / 2;
+    if (index === 0) {
+      // Captain's chair and compact command pedestal.
+      g.roundRect(x - 14, y - 9, 28, 25, 8).fill(0xc6b39f)
+        .stroke({ color: 0x5b5260, width: 2 });
+      g.roundRect(x - 10, y - 6, 20, 11, 5).fill(0x584954);
+      g.rect(x - 19, y + 5, 7, 10).fill(0x8f8178);
+      g.rect(x + 12, y + 5, 7, 10).fill(0x8f8178);
+      return;
+    }
+    // A shallow curved console: warm hull, black control surface, LCARS keys.
+    const cw = index < 7 ? 30 : 34;
+    g.roundRect(x - cw / 2, y - 20, cw, 17, 6).fill(0xc8b5a0)
+      .stroke({ color: 0x675c63, width: 2 });
+    g.roundRect(x - cw / 2 + 3, y - 18, cw - 6, 9, 3).fill(0x080b14);
+    const colors = [0xff9966, 0xffcc99, 0xcc99ff, 0x99ccff];
+    for (let k = 0; k < 4; k++) {
+      g.roundRect(x - cw / 2 + 5 + k * 6, y - 16, 4, 3, 1).fill(colors[(index + k) % colors.length]);
+    }
+    g.rect(x - cw / 2 + 4, y - 7, cw - 8, 3).fill(0x8f7f75);
+  });
+  return g;
 }
 
 /** A message where the floor should be — the only thing the user sees when the
