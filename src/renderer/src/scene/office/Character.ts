@@ -65,6 +65,8 @@ interface CharacterOptions {
   glowColor: number;
   /** Direction faced while seated. Default 'down' so the face is toward the user. */
   seatDirection?: Direction;
+  /** Keep this role standing at its home station instead of applying the seated pose. */
+  seatedAtDesk?: boolean;
   onClick?: (agentId: string) => void;
 }
 
@@ -76,6 +78,7 @@ export class Character {
   private mapRenderer: TiledMapRenderer;
   private deskTile: { x: number; y: number };
   private seatDirection: Direction;
+  private seatedAtDesk: boolean;
   private px: number;
   private py: number;
   private path: { x: number; y: number }[] = [];
@@ -133,6 +136,7 @@ export class Character {
     this.sprite = new CharacterSprite(options.frames);
     this.deskTile = options.seatTile;
     this.seatDirection = options.seatDirection ?? 'down';
+    this.seatedAtDesk = options.seatedAtDesk ?? true;
     this.onClick = options.onClick;
 
     // Appear at the spawn tile (the door) and walk in from there.
@@ -225,6 +229,18 @@ export class Character {
 
   /** Snap into the seated pose at the current (desk) tile. */
   private applySit(): void {
+    if (!this.seatedAtDesk) {
+      this.state = 'idle';
+      this.pendingWork = null;
+      this.pendingSit = false;
+      this.path = [];
+      this.sitting = false;
+      this.direction = this.seatDirection;
+      this.sprite.setSeatedCrop(0);
+      this.sprite.setAnimation('idle', this.direction);
+      this.sprite.setPosition(this.px, this.py);
+      return;
+    }
     this.applySitPose(this.seatDirection);
   }
 

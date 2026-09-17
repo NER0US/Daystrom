@@ -88,6 +88,12 @@ export class TiledMapRenderer {
     return this.walkabilityGrid[ty][tx];
   }
 
+  /** Allow a theme to expose walkable interaction targets over hidden art. */
+  markWalkable(tx: number, ty: number): void {
+    if (tx < 0 || ty < 0 || tx >= this.width || ty >= this.height) return;
+    this.walkabilityGrid[ty][tx] = true;
+  }
+
   tileToPixel(tx: number, ty: number): Point {
     return { x: tx * this.tileSize, y: ty * this.tileSize };
   }

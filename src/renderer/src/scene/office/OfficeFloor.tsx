@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Application, Container, Graphics, Rectangle, Sprite, Ticker, Texture } from 'pixi.js';
+import { Application, Container, Graphics, Sprite, Ticker, Texture } from 'pixi.js';
 // PixiJS uses new Function() internally, blocked by Electron CSP — this patches it.
 import 'pixi.js/unsafe-eval';
 import { useStore, type Agent } from '@/store/store';
@@ -17,7 +17,7 @@ import {
   installContextLossRecovery, planInitFailure, DEFAULT_MAX_INIT_RETRIES
 } from './glRecovery';
 import type { Tile, Facing, ErrandKind, ErrandSpot } from './themeRegistry';
-import daystromBridgeUrl from '../../../../../assets/daystrom/reference/daystrom-reference.png';
+import daystromBridgeUrl from '../../../../../assets/daystrom/reference/daystrom-clean.png';
 
 // The map, tileset atlases, desk-claim order, errand spots, coffee-economy
 // tiles, prop anchors, monitor gids and palette all come from the active
@@ -293,9 +293,8 @@ export function OfficeFloor() {
       const isDaystrom = theme.id === 'daystrom';
       if (isDaystrom) {
         // Keep the office map as the invisible interaction model (collision,
-        // paths and named seats), but use the supplied Daystrom reference as
-        // the visible bridge. Only the reference's bridge viewport is shown;
-        // its surrounding app chrome remains implemented by the live UI.
+        // paths and named seats), but use the supplied clean Daystrom art as
+        // the complete visible bridge.
         for (const layer of mapRenderer.getContainer().children) {
           if (layer !== charLayer) layer.visible = false;
         }
@@ -362,20 +361,28 @@ export function OfficeFloor() {
       for (const name of theme.primarySeatNames) addSeat(mapRenderer.getSpawnPoint(name));
       if (isDaystrom) {
         const officeOverflowSeats = seatTiles.slice();
-        // The office map remains the collision/pathfinding model, but its desk
-        // coordinates do not resemble an Enterprise-D bridge. Replace only the
-        // Daystrom seat targets with walkable tiles arranged like the reference:
-        // command row, forward flight/ops, side support, rear tactical.
-        seatTiles.splice(0, seatTiles.length,
-          { x: 17, y: 14 }, // Jean Luc — centre command chair
-          { x: 13, y: 14 }, // Deanna — command row, port
-          { x: 21, y: 14 }, // Riker — command row, starboard
-          { x: 14, y: 10 }, // Data — forward operations
-          { x: 21, y: 10 }, // Wesley — forward helm
-          { x: 7, y: 15 },  // Geordi — port support
-          { x: 27, y: 14 }, // Beverly — starboard support
-          { x: 17, y: 19 }, // Worf — rear-centre tactical/security
-        );
+        // Convert Pepper's image-local anchors through the loaded texture and
+        // current world dimensions. This keeps placement correct if either the
+        // source asset or map scale changes, without baking in image dimensions.
+        const daystromAnchors = [
+          { x: 704, y: 395 },  // Jean Luc — captain chair
+          { x: 414, y: 850 },  // Deanna — rear-left chair
+          { x: 994, y: 850 },  // Riker — rear-right chair
+          { x: 475, y: 585 },  // Data — forward-left operations chair
+          { x: 934, y: 585 },  // Wesley — forward-right helm chair
+          { x: 176, y: 650 },  // Geordi — port-side standing support
+          { x: 1272, y: 650 }, // Beverly — starboard-side standing support
+          { x: 704, y: 892 },  // Worf — rear-centre tactical chair
+        ];
+        const daystromSeats = daystromAnchors.map((anchor) => imageAnchorToTile(
+          anchor,
+          daystromBridgeTexture!,
+          mapRenderer.width * mapRenderer.tileSize,
+          mapRenderer.height * mapRenderer.tileSize,
+          mapRenderer.tileSize,
+        ));
+        for (const seat of daystromSeats) mapRenderer.markWalkable(seat.x, seat.y);
+        seatTiles.splice(0, seatTiles.length, ...daystromSeats);
         // Keep spare live-agent capacity without disturbing the eight reference
         // stations. Overflow agents retain proven office-map targets.
         for (const seat of officeOverflowSeats) {
@@ -1464,6 +1471,7 @@ export function OfficeFloor() {
           frames,
           seatTile,
           seatDirection: facingForSeat(seatTile),
+          seatedAtDesk: !isDaystrom || (charName !== 'kevin' && charName !== 'angela'),
           spawnTile: entrance, // walk in from the office door
           glowColor: hexNum(colors.accent[agent.accent]) ?? hexToNumber(member.shirt),
           onClick: (id) => useStore.getState().select(id),
@@ -1849,21 +1857,30 @@ export function OfficeFloor() {
   );
 }
 
-/** The supplied design reference is the bridge presentation. The underlying
+/** The supplied clean art is the bridge presentation. The underlying
  * office map remains the invisible navigation, collision and seat model. */
 function paintDaystromBridge(source: Texture, width: number, height: number): Sprite {
-  // Crop out the reference screenshot's macOS/app chrome and Command Center,
-  // retaining only the bridge viewport. The crop matches the map's aspect
-  // ratio closely, avoiding any procedural reconstruction or visible letterbox.
-  const bridgeTexture = new Texture({
-    source: source.source,
-    frame: new Rectangle(47, 121, 961, 622),
-  });
-  const bridge = new Sprite(bridgeTexture);
+  const bridge = new Sprite(source);
   bridge.eventMode = 'none';
   bridge.width = width;
   bridge.height = height;
   return bridge;
+}
+
+function imageAnchorToTile(
+  anchor: { x: number; y: number },
+  source: Texture,
+  worldWidth: number,
+  worldHeight: number,
+  tileSize: number,
+): Tile {
+  const worldX = anchor.x / source.width * worldWidth;
+  const worldY = anchor.y / source.height * worldHeight;
+  // Character feet are centered horizontally and anchored to a tile's bottom.
+  return {
+    x: Math.round(worldX / tileSize - 0.5),
+    y: Math.round(worldY / tileSize - 1),
+  };
 }
 
 /** A message where the floor should be — the only thing the user sees when the
