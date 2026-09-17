@@ -358,6 +358,28 @@ export function OfficeFloor() {
       };
       for (const name of theme.primarySeatNames) addSeat(mapRenderer.getSpawnPoint(name));
       if (isDaystrom) {
+        const officeOverflowSeats = seatTiles.slice();
+        // The office map remains the collision/pathfinding model, but its desk
+        // coordinates do not resemble an Enterprise-D bridge. Replace only the
+        // Daystrom seat targets with walkable tiles arranged like the reference:
+        // command row, forward flight/ops, side support, rear tactical.
+        seatTiles.splice(0, seatTiles.length,
+          { x: 17, y: 14 }, // Jean Luc — centre command chair
+          { x: 13, y: 14 }, // Deanna — command row, port
+          { x: 21, y: 14 }, // Riker — command row, starboard
+          { x: 14, y: 10 }, // Data — forward operations
+          { x: 21, y: 10 }, // Wesley — forward helm
+          { x: 7, y: 15 },  // Geordi — port support
+          { x: 27, y: 14 }, // Beverly — starboard support
+          { x: 17, y: 19 }, // Worf — rear-centre tactical/security
+        );
+        // Keep spare live-agent capacity without disturbing the eight reference
+        // stations. Overflow agents retain proven office-map targets.
+        for (const seat of officeOverflowSeats) {
+          if (!seatTiles.some((candidate) => candidate.x === seat.x && candidate.y === seat.y)) {
+            seatTiles.push(seat);
+          }
+        }
         const stations = paintDaystromStations(seatTiles, mapRenderer.tileSize);
         stations.zIndex = -9_000;
         charLayer.addChild(stations);
@@ -398,8 +420,25 @@ export function OfficeFloor() {
       // Seat 0 is desk-ceo — "Michael's room" — reserved for the god agent.
       // All other workers claim seats from 1 onward.
       const GOD_SEAT = 0;
+      const daystromSeatByCharacter: Partial<Record<string, number>> = {
+        michael: 0, // Jean Luc
+        pam: 1,     // Deanna Troi
+        jim: 2,     // William Riker
+        dwight: 3,  // Data
+        andy: 4,    // Wesley Crusher
+        kevin: 5,   // Geordi La Forge
+        angela: 6,  // Beverly Crusher
+        oscar: 7,   // Worf
+      };
       const claimSeat = (agent: Agent): number | null => {
         if (agent.isGod) { seatClaims.add(GOD_SEAT); return GOD_SEAT; }
+        if (isDaystrom) {
+          const assigned = daystromSeatByCharacter[agent.character];
+          if (assigned != null && assigned < seatTiles.length && !seatClaims.has(assigned)) {
+            seatClaims.add(assigned);
+            return assigned;
+          }
+        }
         for (let i = 1; i < seatTiles.length; i++) {
           if (!seatClaims.has(i)) { seatClaims.add(i); return i; }
         }
@@ -412,6 +451,7 @@ export function OfficeFloor() {
       // worker. Only a desk directly to the SOUTH (face 'down') puts furniture in
       // front of them, which is the one case the leg-crop tucks legs under.
       const facingForSeat = (t: Tile): 'up' | 'down' | 'left' | 'right' => {
+        if (isDaystrom) return 'up';
         if (!mapRenderer.isWalkable(t.x, t.y - 1)) return 'up';
         if (!mapRenderer.isWalkable(t.x, t.y + 1)) return 'down';
         if (!mapRenderer.isWalkable(t.x - 1, t.y)) return 'left';
@@ -1873,19 +1913,22 @@ function paintDaystromStations(seats: readonly Tile[], tileSize: number): Graphi
   const g = new Graphics();
   g.eventMode = 'none';
   seats.forEach((seat, index) => {
+    if (index > 7) return; // overflow seats remain functional but visually quiet
     const x = seat.x * tileSize + tileSize / 2;
     const y = seat.y * tileSize + tileSize / 2;
-    if (index === 0) {
-      // Captain's chair and compact command pedestal.
+    if (index <= 2) {
+      // The three-seat command row: Troi, Jean Luc and Riker. Jean Luc's
+      // centre chair carries the brighter command trim.
+      const commandColor = index === 0 ? 0xff6688 : 0xcc99ff;
       g.roundRect(x - 14, y - 9, 28, 25, 8).fill(0xc6b39f)
-        .stroke({ color: 0x5b5260, width: 2 });
+        .stroke({ color: commandColor, width: index === 0 ? 3 : 2 });
       g.roundRect(x - 10, y - 6, 20, 11, 5).fill(0x584954);
       g.rect(x - 19, y + 5, 7, 10).fill(0x8f8178);
       g.rect(x + 12, y + 5, 7, 10).fill(0x8f8178);
       return;
     }
     // A shallow curved console: warm hull, black control surface, LCARS keys.
-    const cw = index < 7 ? 30 : 34;
+    const cw = index === 7 ? 44 : index >= 5 ? 34 : 38;
     g.roundRect(x - cw / 2, y - 20, cw, 17, 6).fill(0xc8b5a0)
       .stroke({ color: 0x675c63, width: 2 });
     g.roundRect(x - cw / 2 + 3, y - 18, cw - 6, 9, 3).fill(0x080b14);
